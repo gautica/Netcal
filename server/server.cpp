@@ -47,15 +47,7 @@ void* handle_connections(void* socket)
 
     int new_client = *(int*) socket;
     free(socket);
-    /**
-    char* hello = "hello from server";
 
-
-
-    printf("%s\n",buffer );
-    send(new_client , hello , strlen(hello) , 0 );
-    printf("Hello message sent\n");
-    */
     char buffer[BUFFER_SIZE];
     int valread = read( new_client , buffer, BUFFER_SIZE);
     Caculator calc;
@@ -63,9 +55,7 @@ void* handle_connections(void* socket)
     char res[res_str.length()+1];
     strcpy(res, res_str.c_str());
 
-    printf("#######: %s\n", res);
     send(new_client , res, strlen(res) , 0);
-    printf("Hello message sent\n");
 
 }
 
