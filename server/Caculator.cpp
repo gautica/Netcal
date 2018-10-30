@@ -8,7 +8,9 @@ Caculator::Caculator() {}
 std::string Caculator::caculate(std::string expr)
 {
     int res = 0;
-    caculate(expr, res);
+    if (caculate(expr, res) == -1) {
+        return  "0 cannot be devided";
+    }
     std::string str_b, str_o, str_x;
     toBinary(res, str_b);
     toOctal(res, str_o);
@@ -17,7 +19,7 @@ std::string Caculator::caculate(std::string expr)
     return std::to_string(res) + "  " + str_b + "   " + str_o + "   " + str_x;
 }
 
-void Caculator::caculate(std::string expr, int &res)
+int Caculator::caculate(std::string expr, int &res)
 {
     int operand_1 = 0, operand_2 = 0;
     std::string substr_1, substr_2;
@@ -40,11 +42,12 @@ void Caculator::caculate(std::string expr, int &res)
         split(expr, substr_1, substr_2, "/");
         toDecimal(operand_1, substr_1);
         toDecimal(operand_2, substr_2);
-        if (operand_2 == 0) { std::cout << "0 cannot be devided\n"; return; }
+        if (operand_2 == 0) { std::cout << "0 cannot be devided\n"; return -1; }
         res = operand_1 / operand_2;
     } else {
         // for other operators
     }
+    return 0;
 }
 
 void Caculator::toBinary(int decimal, std::string &binary)

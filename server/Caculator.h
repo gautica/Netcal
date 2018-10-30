@@ -5,7 +5,7 @@ class Caculator
 public:
     Caculator();
 
-    void caculate(std::string expr, int &res);
+    int caculate(std::string expr, int &res);
     std::string caculate(std::string expr);
 
     void toBinary(int decimal, std::string &binary);
