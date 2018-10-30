@@ -1,4 +1,4 @@
-all: client exec
+all: client 
 
 exec: client
 	./client
