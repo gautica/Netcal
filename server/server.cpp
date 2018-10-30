@@ -6,13 +6,15 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
-#include <pthread.h>
 #include <netdb.h>
 #include "param.h"
+#include <thread>
+#include <vector>
 
 struct addrinfo hints;
 addrinfo* addr_info;
 #define BUFFER_SIZE 1024
+std::vector<std::thread> vec;
 
 int initalize_server()
 {
@@ -42,43 +44,31 @@ int initalize_server()
     return server_fd;
 }
 
-void* handle_connections(void* socket)
+void handle_connections(int socket)
 {
-
-    int new_client = *(int*) socket;
-    free(socket);
-
-    char buffer[BUFFER_SIZE];
-    int valread = read( new_client , buffer, BUFFER_SIZE);
     Caculator calc;
-    std::string res_str = calc.caculate(buffer);
-    char res[res_str.length()+1];
-    strcpy(res, res_str.c_str());
-
-    send(new_client , res, strlen(res) , 0);
-
+    while(1) {
+        char buffer[BUFFER_SIZE];
+        if (recv(socket,buffer, BUFFER_SIZE, 0) != 0) {
+            std::string res_str = calc.caculate(buffer);
+            char res[res_str.length()+1];
+            strcpy(res, res_str.c_str());
+            send(socket, res, strlen(res), 0);
+        }
+    }
 }
 
 void accept_connections(int socket_number) {
-    pthread_t new_thread;
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setstacksize(&attr, 1024);
 
     while(1) {
-        int* new_client = (int*) malloc(sizeof(int));
+        int new_client = 0;
         //int addrlen = sizeof(addr);
-        if ((*new_client = accept(socket_number, addr_info->ai_addr, &addr_info->ai_addrlen))<0)
+        if ((new_client = accept(socket_number, addr_info->ai_addr, &addr_info->ai_addrlen))<0)
         {
             perror("accept");
             exit(EXIT_FAILURE);
         }
-
-        // Create new thread to handle new_client
-        if (pthread_create(&new_thread, &attr, handle_connections, new_client) != 0) {
-            perror("Failed to create new thread!\n");
-            exit(EXIT_FAILURE);
-        }
+        vec.push_back(std::thread(handle_connections, new_client));
     }
 }
 

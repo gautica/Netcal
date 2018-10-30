@@ -8,9 +8,15 @@ Caculator::Caculator() {}
 std::string Caculator::caculate(std::string expr)
 {
     int res = 0;
-    if (caculate(expr, res) == -1) {
-        return  "0 cannot be devided";
+    try{
+        if (caculate(expr, res) == -1) {
+            return  "0 cannot be devided";
+        }
     }
+    catch(std::exception e) {
+        return "overflow";
+    }
+
     std::string str_b, str_o, str_x;
     toBinary(res, str_b);
     toOctal(res, str_o);
@@ -28,23 +34,29 @@ int Caculator::caculate(std::string expr, int &res)
         toDecimal(operand_1, substr_1);
         toDecimal(operand_2, substr_2);
         res = operand_1 + operand_2;
+        if(res < operand_1 || res < operand_2)
+            throw std::exception();
     }  else if (expr.find("-") != std::string::npos) {
         split(expr, substr_1, substr_2, "-");
         toDecimal(operand_1, substr_1);
         toDecimal(operand_2, substr_2);
         res = operand_1 - operand_2;
+        if(res > operand_1)
+            throw std::exception();
     } else if (expr.find("*") != std::string::npos) {
         split(expr, substr_1, substr_2, "*");
         toDecimal(operand_1, substr_1);
         toDecimal(operand_2, substr_2);
         res = operand_1 * operand_2;
+        if (log2(operand_1) + log2(operand_2) >= 32)
+            throw std::exception();
     } else if (expr.find("/") != std::string::npos) {
         split(expr, substr_1, substr_2, "/");
         toDecimal(operand_1, substr_1);
         toDecimal(operand_2, substr_2);
         if (operand_2 == 0) { std::cout << "0 cannot be devided\n"; return -1; }
         res = operand_1 / operand_2;
-    } else {
+     } else {
         // for other operators
     }
     return 0;
